@@ -12,5 +12,8 @@
 }
 
 .marker {
-  background-image: ;
+  background-image: url("../../icons/marker-30.png");
+  background-size: cover;
+  width: 16px;
+  height: 16px;
 }
