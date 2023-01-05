@@ -1,0 +1,29 @@
+.accordion-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.accordion-header {
+  width: inherit;
+  background-color: cornflowerblue;
+  /* padding: 30px; */
+  /* border-radius: 10px 10px 0 0; */
+}
+
+.accordion-content {
+  opacity: 0;
+  display: none;
+  width: inherit;
+  background-color: aqua;
+  /* padding: 30px; */
+  /* border-radius: 0 0 10px 10px; */
+  transition: opacity 0.5s ease-in-out;
+}
+
+.show {
+  display: block;
+  opacity: 1;
+}

@@ -2,13 +2,23 @@ import "@tomtom-international/web-sdk-maps/dist/maps.css";
 import tt from "@tomtom-international/web-sdk-maps";
 import ttapi from "@tomtom-international/web-sdk-services";
 import { useState, useEffect, useRef } from "react";
+import CreateRouteComponent from "../CreateRoute/CreateRouteComponent";
 import "./styles.css";
 
-const MapComponent = () => {
+const MapComponent = ({
+  stops,
+  setStopDetailList,
+  setStops,
+  stopDetailList,
+  actualStops,
+  setActualStops,
+}) => {
   const mapElement = useRef();
   const [longitude, setLongitude] = useState(-0.22);
   const [latitude, setLatitude] = useState(51.2);
   const [map, setMap] = useState({});
+  const [action, setAction] = useState("");
+  const [uniqueId, setUniqueId] = useState(new Date().getTime());
 
   const converToPoints = (lngLat) => {
     return {
@@ -49,6 +59,7 @@ const MapComponent = () => {
     })
       .setLngLat(lngLat)
       .addTo(map);
+    setStop(lngLat);
   };
   useEffect(() => {
     const origin = {
@@ -85,6 +96,7 @@ const MapComponent = () => {
         element: element,
       })
         .setLngLat([longitude, latitude])
+
         .addTo(map);
 
       marker.on("dragend", () => {
@@ -94,6 +106,10 @@ const MapComponent = () => {
       });
 
       marker.setPopup(popup).togglePopup();
+
+      setTimeout(() => {
+        marker.remove();
+      }, 40000);
     };
 
     addMarker();
@@ -171,6 +187,14 @@ const MapComponent = () => {
     return () => map.remove();
   }, [longitude, latitude]);
 
+  const clickHandler = (actionType) => {
+    setAction(actionType);
+    if (actionType === "create") {
+      setUniqueId(new Date().getTime());
+    }
+  };
+
+  console.log(stop);
   return (
     <>
       {map && (
@@ -183,14 +207,43 @@ const MapComponent = () => {
               id="longitude"
               className="longitude"
               placeholder="Put in longitude"
-              onChange={(e) => setLongitude(e.target.value)}
+              onBlur={(e) => setLongitude(e.target.value)}
             />
             <input
               type="text"
               id="latitude"
               className="latitude"
               placeholder="Put in latitude"
-              onChange={(e) => setLatitude(e.target.value)}
+              onBlur={(e) => setLatitude(e.target.value)}
+            />
+            <button
+              onClick={() => clickHandler("create")}
+              className={action === "create" ? "hide" : ""}
+            >
+              Create
+            </button>
+
+            {/* <button onClick={() => clickHandler("view")}>View</button>
+            <div className={action === "view" ? "show" : "hide"}>
+              View Routes
+            </div>
+            <button onClick={() => clickHandler("edit")}>Edit</button>
+            <div className={action === "edit" ? "show" : "hide"}>
+              Edit Routes
+            </div>
+            <button onClick={() => clickHandler("delete")}>Delete</button>
+            <div className={action === "delete" ? "show" : "hide"}>
+              Delete Routes
+            </div> */}
+            <CreateRouteComponent
+              action={action}
+              uniqueId={uniqueId}
+              stops={stops}
+              setStops={setStops}
+              stopDetailList={stopDetailList}
+              setStopDetailList={setStopDetailList}
+              actualStops={actualStops}
+              setActualStops={setActualStops}
             />
           </div>
         </div>
