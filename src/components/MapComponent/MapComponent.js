@@ -61,6 +61,25 @@ const MapComponent = ({
       .addTo(map);
     setStop(lngLat);
   };
+
+  const createDestinations = (stopDetailList) => {
+    let destinations = [];
+    stopDetailList.forEach((stop) => {
+      destinations.push({
+        lat: stop.latitude,
+        lng: stop.longitude,
+      });
+      addDeliveryMarker(
+        {
+          lat: stop.latitude,
+          lng: stop.longitude,
+        },
+        map
+      );
+    });
+    return destinations;
+  };
+
   useEffect(() => {
     const origin = {
       lng: longitude,
@@ -107,9 +126,9 @@ const MapComponent = ({
 
       marker.setPopup(popup).togglePopup();
 
-      setTimeout(() => {
-        marker.remove();
-      }, 40000);
+      // setTimeout(() => {
+      //   marker.remove();
+      // }, 40000);
     };
 
     addMarker();
@@ -179,7 +198,7 @@ const MapComponent = ({
     };
 
     map.on("click", (e) => {
-      destinations.push(e.lngLat);
+      destinations = createDestinations(stopDetailList);
       addDeliveryMarker(e.lngLat, map);
       reCalculateRoutes();
     });

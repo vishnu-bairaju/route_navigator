@@ -13,8 +13,12 @@ const CreateRouteComponent = ({
   actualStops,
   setActualStops,
 }) => {
+  const [isNewStopRequested, setIsNewStopRequested] = useState(false);
+  const [stopUniqueId, setStopUniqueId] = useState(new Date().getTime());
   const handleAddStopsClick = () => {
     setStops((prev) => prev + 1);
+    setIsNewStopRequested((prev) => !prev);
+    setStopUniqueId(new Date().getTime());
   };
 
   //   useEffect(() => {
@@ -47,17 +51,17 @@ const CreateRouteComponent = ({
             </select>
           </div>
         </fieldset>
-        {!!(stops && stops > 0) && (
+        {!!(stopDetailList && stopDetailList.length > 0) && (
           <fieldset>
-            {[...Array(stops)].map((_, index) => {
+            {stopDetailList.map((currStop, index) => {
               return (
                 <Accordion>
                   <StopComponent
                     setStops={setStops}
-                    index={index}
+                    index={currStop.id}
                     setStopDetailList={setStopDetailList}
                     stopDetailList={stopDetailList}
-                    // stop={stopDetailList[index]}
+                    stop={currStop}
                     setActualStops={setActualStops}
                   />
                 </Accordion>
@@ -65,8 +69,23 @@ const CreateRouteComponent = ({
             })}
           </fieldset>
         )}
+        <div className={`${isNewStopRequested ? "" : "hide"}`}>
+          <fieldset>
+            <Accordion>
+              <StopComponent
+                setStops={setStops}
+                index={stopUniqueId}
+                setStopDetailList={setStopDetailList}
+                stopDetailList={stopDetailList}
+                setActualStops={setActualStops}
+                setIsNewStopRequested={setIsNewStopRequested}
+                isNewStopRequested={isNewStopRequested}
+              />
+            </Accordion>
+          </fieldset>
+        </div>
         {/* <StopComponent /> */}
-        <div className="field">
+        <div className={`${!isNewStopRequested ? "" : "hide"}`}>
           <div onClick={handleAddStopsClick} stops={stops}>
             Add Stop
           </div>

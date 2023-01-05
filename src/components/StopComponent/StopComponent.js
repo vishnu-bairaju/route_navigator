@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import "./styles.css";
 
 const StopComponent = ({
   setStops,
@@ -7,10 +8,13 @@ const StopComponent = ({
   stop,
   stopDetailList,
   setActualStops,
+  setIsNewStopRequested,
+  isNewStopRequested,
 }) => {
   const [lat, setLat] = useState();
   const [lng, setLng] = useState();
   const [stopName, setStopName] = useState();
+  const [isStopAdded, setIsStopAdded] = useState(false);
 
   const handleOnSubmit = (e) => {
     let stop = {
@@ -18,25 +22,40 @@ const StopComponent = ({
       name: stopName,
       longitude: lat,
       latitude: lng,
+      addedToRoute: true,
     };
     setStopDetailList((prevList) => {
       prevList.push(stop);
       return prevList;
     });
-    setActualStops((prev) => prev + 1);
+    // setActualStops((prev) => prev + 1);
+    setIsNewStopRequested((prev) => !prev);
+    // setIsStopAdded((prev) => !prev);
     e.preventDefault();
   };
 
   const handleNameFocusOut = (e) => {
-    setStopName(e.target.value);
+    if (isNewStopRequested) {
+      setStopName("");
+    } else {
+      setStopName(e.target.value);
+    }
   };
 
   const handleLatFocusOut = (e) => {
-    setLat(e.target.value);
+    if (isNewStopRequested) {
+      setLat(0);
+    } else {
+      setLat(e.target.value);
+    }
   };
 
   const handleLngFocusOut = (e) => {
-    setLng(e.target.value);
+    if (isNewStopRequested) {
+      setLng(0);
+    } else {
+      setLng(e.target.value);
+    }
   };
 
   const handleRemoveStopClick = (removedStop) => {
@@ -50,6 +69,14 @@ const StopComponent = ({
     setStopDetailList(updatedStopsList);
   };
 
+  // useEffect(() => {
+  //   if (isNewStopRequested) {
+  //     handleNameFocusOut();
+  //     handleLatFocusOut();
+  //     handleLngFocusOut();
+  //   }
+  // }, isNewStopRequested);
+
   console.log("rendered-stop - ", stop);
 
   return (
@@ -60,20 +87,25 @@ const StopComponent = ({
       </div>
       <div className="field">
         <label className="field-label">Stop Name</label>
-        <input onBlur={handleNameFocusOut} />
+        <input onChange={handleNameFocusOut} value={stop && stop.name} />
       </div>
       <div className="field">
         <label className="field-label">Latitude</label>
-        <input onBlur={handleLatFocusOut} />
+        <input onChange={handleLatFocusOut} value={stop && stop.latitude} />
       </div>
       <div className="field">
         <label className="field-label">Longitude</label>
-        <input onBlur={handleLngFocusOut} />
+        <input onChange={handleLngFocusOut} value={stop && stop.longitude} />
       </div>
       <div className="field">
         <div onClick={() => handleRemoveStopClick(stop)}>remove</div>
       </div>
-      <button onClick={handleOnSubmit}>Add</button>
+      <div
+        onClick={handleOnSubmit}
+        className={stop && stop.addedToRoute ? "hide" : ""}
+      >
+        Add
+      </div>
     </form>
   );
 };
