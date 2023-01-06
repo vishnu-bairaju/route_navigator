@@ -8,7 +8,7 @@ const createRoute = (route) => {
   };
 };
 
-const deleteRoute = () => {
+const deleteRoute = (route) => {
   return {
     type: DELETE_ROUTE,
     payload: route,

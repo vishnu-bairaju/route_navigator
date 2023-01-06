@@ -3,12 +3,10 @@
 
 .route-card {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
   background-color: cadetblue;
   margin: 20px;
-  border-radius: 10px;
-  flex-direction: column;
   box-shadow: 0px 0px 3px black;
   transition: 0.3s;
   border-radius: 5px;
@@ -27,4 +25,17 @@
 
 .value {
   font-style: italic;
+}
+
+.btn {
+  display: flex;
+  background-color: aquamarine;
+  flex: 1 1;
+  justify-content: center;
+  box-shadow: 0px 0px 5px black;
+  margin: 20px;
+  border-radius: 5px;
+  color: forestgreen;
+  padding: 10px;
+  cursor: pointer;
 }

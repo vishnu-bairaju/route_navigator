@@ -323,9 +323,9 @@ const MapComponent = ({
               onClick={() => clickHandler("view")}
               className={` btn ${action === "view" ? "enabled" : ""}`}
             >
-              View
+              View all Routes
             </div>
-            <div
+            {/* <div
               onClick={() => clickHandler("edit")}
               className={` btn ${action === "edit" ? "enabled" : ""}`}
             >
@@ -336,7 +336,7 @@ const MapComponent = ({
               className={` btn ${action === "delete" ? "enabled" : ""}`}
             >
               Delete
-            </div>
+            </div> */}
           </div>
           <div className={action === "create" ? "show" : "hide"}>
             <CreateRouteComponent
@@ -354,18 +354,22 @@ const MapComponent = ({
               routes={routes}
             />
           </div>
-          {!!(routes && routes.length > 0) && (
+          {!!(routes && routes.length > 0) ? (
             <div className={action === "view" ? "show" : "hide"}>
               <ViewComponent
                 routes={routes}
                 clickViewHandler={clickViewHandler}
               />
             </div>
+          ) : (
+            action === "view" && <div>No Routes found!! 😕</div>
           )}
-          <div className={action === "edit" ? "show" : "hide"}>Edit Routes</div>
-          <div className={action === "delete" ? "show" : "hide"}>
-            Delete Routes
-          </div>
+          {/* <div className={action === "view" ? "show" : "hide"}>
+            <ViewComponent
+              routes={routes}
+              clickViewHandler={clickViewHandler}
+            />
+          </div> */}
         </div>
       )}
     </>
