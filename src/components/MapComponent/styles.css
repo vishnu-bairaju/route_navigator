@@ -49,3 +49,8 @@
   background-color: darkgray;
   color: white;
 }
+
+.show {
+  display: block;
+  width: 100%;
+}

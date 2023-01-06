@@ -3,7 +3,7 @@ import Accordion from "../Accordion/AccordionComponent";
 import StopComponent from "../StopComponent/StopComponent";
 import allActions from "../../actions/indexAction";
 import "./styles.css";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const CreateRouteComponent = ({
   action,
@@ -15,7 +15,7 @@ const CreateRouteComponent = ({
   setActualStops,
   setUniqueId,
   setRoute,
-  route,
+  routes,
 }) => {
   const [isNewStopRequested, setIsNewStopRequested] = useState(false);
   const [routeName, setRouteName] = useState("");
@@ -23,10 +23,6 @@ const CreateRouteComponent = ({
   const [status, setStatus] = useState("active");
   const [stopUniqueId, setStopUniqueId] = useState(new Date().getTime());
 
-  const routes = useSelector((state) => {
-    console.log("State: ", state);
-    return state.routeReducer.routes;
-  });
   const dispatch = useDispatch();
   const handleAddStopsClick = () => {
     setStops((prev) => prev + 1);

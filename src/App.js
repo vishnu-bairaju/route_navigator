@@ -13,6 +13,7 @@ export default function App() {
   const [stopDetailList, setStopDetailList] = useState([]);
   const [actualStops, setActualStops] = useState(0);
   const [route, setRoute] = useState({});
+  const [targetRoute, setTargetRoute] = useState();
   // const store = createStore(store, devToolsEnhancer());
   return (
     <Provider store={store}>
@@ -29,6 +30,8 @@ export default function App() {
           setActualStops={setActualStops}
           setRoute={setRoute}
           route={route}
+          targetRoute={targetRoute}
+          setTargetRoute={setTargetRoute}
         />
       </div>
     </Provider>
