@@ -100,14 +100,16 @@ const StopComponent = ({
           value={!isNewStop ? stop.longitude : lng}
         />
       </div>
-      <div className="field">
-        <div onClick={() => handleRemoveStopClick(stop)}>remove</div>
-      </div>
-      <div
-        onClick={handleOnSubmit}
-        className={stop && stop.addedToRoute ? "hide" : ""}
-      >
-        Add
+      <div className="btn-container">
+        <div onClick={() => handleRemoveStopClick(stop)} className="btn">
+          remove
+        </div>
+        <div
+          onClick={handleOnSubmit}
+          className={stop && stop.addedToRoute ? "hide" : "btn"}
+        >
+          Add
+        </div>
       </div>
     </form>
   );

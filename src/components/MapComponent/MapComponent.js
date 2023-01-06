@@ -48,7 +48,6 @@ const MapComponent = ({
   };
 
   const addNewMarkerAndPlotRoute = (stopsList, map) => {
-    // let stopsList = isCreate ? stopDetailList : targetRoute;
     console.log("stops list recieved ", stopsList);
     const origin = {
       lng: stopsList && stopsList.length > 0 && stopsList[0].longitude,
@@ -122,12 +121,6 @@ const MapComponent = ({
     };
 
     const addStop = () => {
-      // let selectedRouteStops = [];
-      // if(stopsList && stopsList.length > 0){
-      //   selectedRouteStops = stopDetailList;
-      // } else {
-
-      // }
       if (stopsList && stopsList.length === 1) {
         console.log(stopsList[0].latitude, stopsList[0].longitude);
         addDeliveryMarker(
@@ -155,19 +148,6 @@ const MapComponent = ({
   };
 
   useEffect(() => {
-    const origin = {
-      lng:
-        stopDetailList &&
-        stopDetailList.length > 0 &&
-        stopDetailList[0].longitude,
-      lat:
-        stopDetailList &&
-        stopDetailList.length > 0 &&
-        stopDetailList[0].latitude,
-    };
-
-    let destinations = [];
-
     let centerLng = 0;
     let centerLat = 0;
     if (!!(stopDetailList && stopDetailList.length > 0)) {
@@ -176,6 +156,9 @@ const MapComponent = ({
     } else if (targetRoute && targetRoute.stops.length > 0) {
       centerLng = targetRoute.stops[0].longitude;
       centerLat = targetRoute.stops[0].latitude;
+    } else {
+      centerLng = 77.59;
+      centerLat = 12.97;
     }
 
     let map = tt.map({
@@ -191,100 +174,6 @@ const MapComponent = ({
 
     setMap(map);
 
-    const sortDestinations = (locations) => {
-      const pointsForDestinations = locations.map((destination) => {
-        return converToPoints(destination);
-      });
-
-      const callParameters = {
-        key: "8LwBzLiXVxbsArt800KkbAiK5mT6O3hg",
-        destinations: pointsForDestinations,
-        origins: [converToPoints(origin)],
-      };
-
-      return new Promise((resolve, reject) => {
-        ttapi.services
-          .matrixRouting(callParameters)
-          .then((matrixAPIResults) => {
-            const results = matrixAPIResults.matrix[0];
-            const resultsArray = results.map((result, index) => {
-              return {
-                location: locations[index],
-                drivingtime: result.response.routeSummary.travelTimeInSeconds,
-              };
-            });
-            resultsArray.sort((a, b) => {
-              return a.drivingtime - b.drivingtime;
-            });
-            const sortedLocations = resultsArray.map((result) => {
-              return result.location;
-            });
-            resolve(sortedLocations);
-          });
-      });
-    };
-
-    const reCalculateRoutes = () => {
-      sortDestinations(destinations).then((sortedDestinations) => {
-        sortedDestinations.unshift(origin);
-
-        ttapi.services
-          .calculateRoute({
-            key: "8LwBzLiXVxbsArt800KkbAiK5mT6O3hg",
-            locations: sortedDestinations,
-          })
-          .then((routeData) => {
-            const geoJSON = routeData.toGeoJson();
-            if (map.getLayer("route")) {
-              map.removeLayer("route");
-              map.removeSource("route");
-            }
-            map.addLayer({
-              id: "route",
-              type: "line",
-              source: {
-                type: "geojson",
-                data: geoJSON,
-              },
-              paint: {
-                "line-color": "#4a90e2",
-                "line-width": 3,
-              },
-            });
-          });
-      });
-    };
-
-    const addStop = () => {
-      let selectedRouteStops = [];
-      if (stopDetailList && stopDetailList.length > 0) {
-        selectedRouteStops = stopDetailList;
-      } else {
-      }
-      if (stopDetailList && stopDetailList.length === 1) {
-        console.log(stopDetailList[0].latitude, stopDetailList[0].longitude);
-        addDeliveryMarker(
-          new tt.LngLat(
-            Number(stopDetailList[0].longitude),
-            Number(stopDetailList[0].latitude)
-          ),
-          map
-        );
-      } else if (stopDetailList && stopDetailList.length > 0) {
-        stopDetailList.forEach((stop) => {
-          destinations.push(
-            new tt.LngLat(Number(stop.longitude), Number(stop.latitude))
-          );
-          addDeliveryMarker(
-            new tt.LngLat(Number(stop.longitude), Number(stop.latitude)),
-            map
-          );
-        });
-        reCalculateRoutes();
-      }
-    };
-
-    // addStop();
     if (!!(stopDetailList && stopDetailList.length > 0)) {
       addNewMarkerAndPlotRoute(stopDetailList, map);
     } else if (!!(targetRoute && targetRoute.stops)) {
@@ -325,18 +214,6 @@ const MapComponent = ({
             >
               View all Routes
             </div>
-            {/* <div
-              onClick={() => clickHandler("edit")}
-              className={` btn ${action === "edit" ? "enabled" : ""}`}
-            >
-              Edit
-            </div>
-            <div
-              onClick={() => clickHandler("delete")}
-              className={` btn ${action === "delete" ? "enabled" : ""}`}
-            >
-              Delete
-            </div> */}
           </div>
           <div className={action === "create" ? "show" : "hide"}>
             <CreateRouteComponent
@@ -346,10 +223,7 @@ const MapComponent = ({
               setStops={setStops}
               stopDetailList={stopDetailList}
               setStopDetailList={setStopDetailList}
-              actualStops={actualStops}
               setActualStops={setActualStops}
-              setRoute={setRoute}
-              route={route}
               setUniqueId={setUniqueId}
               routes={routes}
             />
@@ -359,6 +233,15 @@ const MapComponent = ({
               <ViewComponent
                 routes={routes}
                 clickViewHandler={clickViewHandler}
+                action={action}
+                uniqueId={uniqueId}
+                stops={stops}
+                setStops={setStops}
+                stopDetailList={stopDetailList}
+                setStopDetailList={setStopDetailList}
+                setActualStops={setActualStops}
+                setUniqueId={setUniqueId}
+                routes={routes}
               />
             </div>
           ) : (
@@ -366,8 +249,16 @@ const MapComponent = ({
           )}
           {/* <div className={action === "view" ? "show" : "hide"}>
             <ViewComponent
-              routes={routes}
               clickViewHandler={clickViewHandler}
+              action={action}
+              uniqueId={uniqueId}
+              stops={stops}
+              setStops={setStops}
+              stopDetailList={stopDetailList}
+              setStopDetailList={setStopDetailList}
+              setActualStops={setActualStops}
+              setUniqueId={setUniqueId}
+              routes={routes}
             />
           </div> */}
         </div>

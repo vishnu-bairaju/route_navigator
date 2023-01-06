@@ -10,7 +10,7 @@
   width: inherit;
   background-color: cornflowerblue;
   /* padding: 30px; */
-  /* border-radius: 10px 10px 0 0; */
+  border-radius: 10px 10px 0 0;
 }
 
 .accordion-content {
@@ -18,12 +18,15 @@
   display: none;
   width: inherit;
   background-color: aqua;
-  /* padding: 30px; */
-  /* border-radius: 0 0 10px 10px; */
   transition: opacity 0.5s ease-in-out;
+  border-radius: 0 0 10px 10px;
 }
 
 .show {
   display: block;
   opacity: 1;
+}
+
+.stop-header {
+  padding: 10px;
 }

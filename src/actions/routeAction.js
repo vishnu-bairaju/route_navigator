@@ -1,4 +1,4 @@
-import { CREATE_ROUTE, DELETE_ROUTE } from "./routeTypes";
+import { CREATE_ROUTE, EDIT_ROUTE, DELETE_ROUTE } from "./routeTypes";
 
 const createRoute = (route) => {
   console.log("Create Route", route);
@@ -8,6 +8,14 @@ const createRoute = (route) => {
   };
 };
 
+const editRoute = (route) => {
+    console.log("Edit Route", route);
+  return {
+    type: EDIT_ROUTE,
+    payload: route,
+  };
+}
+
 const deleteRoute = (route) => {
   return {
     type: DELETE_ROUTE,
@@ -15,4 +23,4 @@ const deleteRoute = (route) => {
   };
 };
 
-export default { createRoute, deleteRoute };
+export default { createRoute, editRoute, deleteRoute };

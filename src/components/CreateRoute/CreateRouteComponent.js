@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Accordion from "../Accordion/AccordionComponent";
 import StopComponent from "../StopComponent/StopComponent";
 import allActions from "../../actions/indexAction";
@@ -14,13 +14,21 @@ const CreateRouteComponent = ({
   stopDetailList,
   setActualStops,
   setUniqueId,
-  setRoute,
   routes,
+  isEdit,
+  EditRoute,
+  setIsEdit,
 }) => {
   const [isNewStopRequested, setIsNewStopRequested] = useState(false);
-  const [routeName, setRouteName] = useState("");
-  const [direction, setDirection] = useState("");
-  const [status, setStatus] = useState("active");
+  const [routeName, setRouteName] = useState(
+    (EditRoute && EditRoute.name) || ""
+  );
+  const [direction, setDirection] = useState(
+    (EditRoute && EditRoute.routeDirection) || "Up"
+  );
+  const [status, setStatus] = useState(
+    (EditRoute && EditRoute.routeStatus) || "active"
+  );
   const [stopUniqueId, setStopUniqueId] = useState(new Date().getTime());
 
   const dispatch = useDispatch();
@@ -44,21 +52,25 @@ const CreateRouteComponent = ({
 
   const handleRouteSubmit = () => {
     console.log({
-      id: uniqueId,
+      id: isEdit ? EditRoute && EditRoute.id : uniqueId,
       name: routeName,
       routeDirection: direction,
       routeStatus: status,
       stops: stopDetailList,
     });
     let routeToBeStored = {
-      id: uniqueId,
+      id: isEdit ? EditRoute && EditRoute.id : uniqueId,
       name: routeName,
       routeDirection: direction,
       routeStatus: status,
       stops: stopDetailList,
     };
     // setRoute(routeToBeStored);
-    dispatch(allActions.routeAction.createRoute(routeToBeStored));
+    if (isEdit) {
+      dispatch(allActions.routeAction.editRoute(routeToBeStored));
+    } else {
+      dispatch(allActions.routeAction.createRoute(routeToBeStored));
+    }
     setStopDetailList([]);
     setStops(0);
     setActualStops(0);
@@ -66,19 +78,22 @@ const CreateRouteComponent = ({
     setDirection("");
     setStatus("active");
     setUniqueId(new Date().getTime());
+    setIsEdit && setIsEdit((prev) => !prev);
   };
 
   console.log("store routelist", routes);
 
-  //   useEffect(() => {
-  //     console.log(stopDetailList);
-  //   }, [actualStops]);
+  useEffect(() => {
+    if (EditRoute) setStopDetailList(EditRoute.stops);
+  }, [isEdit]);
 
   console.log("stop details", stopDetailList);
 
   return (
-    <div className={`form-wrapper ${action === "create" ? "" : "hide"}`}>
-      <form className="field-form ">
+    <div
+      className={`form-wrapper ${action === "create" || isEdit ? "" : "hide"}`}
+    >
+      <div className="field-form">
         <fieldset>
           <div className="field">
             <label className="field-label">Name</label>
@@ -86,11 +101,19 @@ const CreateRouteComponent = ({
           </div>
           <div className="field">
             <label className="field-label">Direction</label>
-            <input onChange={handleDirectionChange} value={direction} />
+            <select
+              id="direction"
+              className="direction"
+              onChange={handleDirectionChange}
+              value={direction}
+            >
+              <option value="Up">Up</option>
+              <option value="Down">Down</option>
+            </select>
           </div>
           <div className="field">
             <label className="field-label">Route Id</label>
-            <input value={uniqueId} />
+            <input value={isEdit ? EditRoute && EditRoute.id : uniqueId} />
           </div>
           <div className="field">
             <label className="field-label">Status</label>
@@ -140,13 +163,18 @@ const CreateRouteComponent = ({
           </fieldset>
         )}
         {/* <StopComponent /> */}
-        <div className={`${!isNewStopRequested ? "" : "hide"}`}>
-          <div onClick={handleAddStopsClick} stops={stops}>
+        <div className="btn-container">
+          <div
+            className={`${!isNewStopRequested ? "btn" : "hide"}`}
+            onClick={handleAddStopsClick}
+          >
             Add Stop
           </div>
+          <div onClick={handleRouteSubmit} className="btn">
+            Submit
+          </div>
         </div>
-        <div onClick={handleRouteSubmit}>Submit</div>
-      </form>
+      </div>
     </div>
   );
 };

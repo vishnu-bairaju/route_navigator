@@ -1,75 +1,112 @@
 import { useState, useReducer } from "react";
 
-const FormComponent = () => {
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setSubmitting(true);
-
-    setTimeout(() => {
-      setSubmitting(false);
-    }, 3000);
+const FormComponent = ({
+  stopDetailList,
+  setStops,
+  setStopDetailList,
+  setActualStops,
+  handleRouteSubmit
+}) => {
+  const [isNewStopRequested, setIsNewStopRequested] = useState(false);
+  const [routeName, setRouteName] = useState("");
+  const [direction, setDirection] = useState("Up");
+  const [status, setStatus] = useState("active");
+  const [stopUniqueId, setStopUniqueId] = useState(new Date().getTime());
+  
+  const handleAddStopsClick = () => {
+    setStops((prev) => prev + 1);
+    setIsNewStopRequested((prev) => !prev);
+    setStopUniqueId(new Date().getTime());
+  };
+  const handleNameChange = (e) => {
+    setRouteName(e.target.value);
   };
 
-  const handleChange = (event) => {
-    console.log(event.target.value);
+  const handleDirectionChange = (e) => {
+    setDirection(e.target.value);
   };
 
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
+  };
   return (
-    <div className="wrapper">
-      <h1>How About Them Apples</h1>
-      {/* {submitting && (
-        <div>
-          You are submitting the following:
-          <ul>
-            {Object.entries(formData).map(([name, value]) => (
-              <li key={name}>
-                <strong>{name}</strong>: {value.toString()}
-              </li>
-            ))}
-          </ul>
+    <div className="field-form">
+      <fieldset>
+        <div className="field">
+          <label className="field-label">Name</label>
+          <input onChange={handleNameChange} value={routeName} />
         </div>
-      )} */}
-      <form onSubmit={handleSubmit}>
+        <div className="field">
+          <label className="field-label">Direction</label>
+          <select
+            id="direction"
+            className="direction"
+            onChange={handleDirectionChange}
+            value={direction}
+          >
+            <option value="Up">Up</option>
+            <option value="Down">Down</option>
+          </select>
+        </div>
+        <div className="field">
+          <label className="field-label">Route Id</label>
+          <input value={uniqueId} />
+        </div>
+        <div className="field">
+          <label className="field-label">Status</label>
+          <select
+            id="status"
+            className="status"
+            onChange={handleStatusChange}
+            value={status}
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </fieldset>
+      {!!(stopDetailList && stopDetailList.length > 0) && (
         <fieldset>
-          <label>
-            <p>Name</p>
-            <input name="name" onChange={handleChange} value={""} />
-          </label>
+          {stopDetailList.map((currStop, index) => {
+            return (
+              <Accordion>
+                <StopComponent
+                  setStops={setStops}
+                  index={currStop.id}
+                  setStopDetailList={setStopDetailList}
+                  stopDetailList={stopDetailList}
+                  stop={currStop}
+                  setActualStops={setActualStops}
+                />
+              </Accordion>
+            );
+          })}
         </fieldset>
-        <fieldset>
-          <label>
-            <p>Apples</p>
-            <select name="apple" onChange={handleChange} value={""}>
-              <option value="">--Please choose an option--</option>
-              <option value="fuji">Fuji</option>
-              <option value="jonathan">Jonathan</option>
-              <option value="honey-crisp">Honey Crisp</option>
-            </select>
-          </label>
-          <label>
-            <p>Count</p>
-            <input
-              type="number"
-              name="count"
-              onChange={handleChange}
-              step="1"
-              value={""}
+      )}
+      {isNewStopRequested && (
+        <fieldset className={`${isNewStopRequested ? "" : "hide"}`}>
+          <Accordion>
+            <StopComponent
+              setStops={setStops}
+              index={stopUniqueId}
+              setStopDetailList={setStopDetailList}
+              stopDetailList={stopDetailList}
+              setActualStops={setActualStops}
+              setIsNewStopRequested={setIsNewStopRequested}
+              isNewStopRequested={isNewStopRequested}
+              isNewStop
             />
-          </label>
-          <label>
-            <p>Gift Wrap</p>
-            <input
-              type="checkbox"
-              name="gift-wrap"
-              onChange={handleChange}
-              checked={false}
-            />
-          </label>
+          </Accordion>
         </fieldset>
-        <button type="submit">Submit</button>
-      </form>
+      )}
+      {/* <StopComponent /> */}
+      <div className={`${!isNewStopRequested ? "" : "hide"}`}>
+        <div onClick={handleAddStopsClick} stops={stops}>
+          Add Stop
+        </div>
+      </div>
+      <div onClick={handleRouteSubmit}>Submit</div>
+      {/* <button type="submit">Submit</button> */}
     </div>
   );
 };

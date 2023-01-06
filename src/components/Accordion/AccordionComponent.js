@@ -11,7 +11,7 @@ const Accordion = ({ children }) => {
     <>
       <div className="accordion-wrapper">
         <div className="accordion-header" onClick={clickHandler}>
-          <div>Stop Header</div>
+          <div className="stop-header">Stop Header</div>
         </div>
         <div className={`accordion-content ${isOpen ? "show" : ""}`}>
           {children}

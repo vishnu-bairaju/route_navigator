@@ -1,143 +1,55 @@
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 import allActions from "../../actions/indexAction";
+import EditComponent from "../EditComponent/EditComponent";
 import "./styles.css";
 
 var dummyRoutes = [
   {
-    name: "klm",
-    routeDirection: "up/down",
-    id: "1624643654",
+    id: 1673024301903,
+    name: "r1",
+    routeDirection: "Up",
     routeStatus: "active",
     stops: [
       {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
+        id: "STOP-1673024535216",
+        name: "s1",
+        longitude: "-0.3",
+        latitude: "51.3",
+        addedToRoute: true,
       },
       {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-    ],
-  },
-  {
-    name: "klm",
-    routeDirection: "up/down",
-    id: "1624643654",
-    routeStatus: "active",
-    stops: [
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-    ],
-  },
-  {
-    name: "klm",
-    routeDirection: "up/down",
-    id: "1624643654",
-    routeStatus: "active",
-    stops: [
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-    ],
-  },
-  {
-    name: "klm",
-    routeDirection: "up/down",
-    id: "1624643654",
-    routeStatus: "active",
-    stops: [
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
-      },
-      {
-        stop_id: "xyz",
-        stop_name: "abc",
-        latitude: "lat1",
-        longitude: "long1",
+        id: "STOP-1673024558588",
+        name: "s2",
+        longitude: "-0.5",
+        latitude: "51.3",
+        addedToRoute: true,
       },
     ],
   },
 ];
 
-const ViewComponent = ({ routes, clickViewHandler }) => {
+const ViewComponent = ({
+  routes,
+  clickViewHandler,
+  action,
+  uniqueId,
+  stops,
+  setStops,
+  stopDetailList,
+  setStopDetailList,
+  setActualStops,
+  setUniqueId,
+}) => {
   const dispatch = useDispatch();
+  const [isEdit, setIsEdit] = useState(false);
 
   const handleDeleteClick = (route) => {
     dispatch(allActions.routeAction.deleteRoute(route));
+  };
+  const handleEditClick = (route) => {
+    clickViewHandler(route);
+    setIsEdit((prev) => !prev);
   };
 
   return (
@@ -176,11 +88,28 @@ const ViewComponent = ({ routes, clickViewHandler }) => {
                     <div class="btn" onClick={() => clickViewHandler(route)}>
                       View
                     </div>
-                    <div class="btn">Edit</div>
+                    <div class="btn" onClick={() => handleEditClick(route)}>
+                      Edit
+                    </div>
                     <div class="btn" onClick={() => handleDeleteClick(route)}>
                       Delete
                     </div>
                   </div>
+                  {isEdit && (
+                    <EditComponent
+                      EditRoute={route}
+                      action={action}
+                      uniqueId={uniqueId}
+                      stops={stops}
+                      setStops={setStops}
+                      stopDetailList={stopDetailList}
+                      setStopDetailList={setStopDetailList}
+                      setActualStops={setActualStops}
+                      setUniqueId={setUniqueId}
+                      routes={routes}
+                      setIsEdit={setIsEdit}
+                    />
+                  )}
                 </div>
               )
             );
