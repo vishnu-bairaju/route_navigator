@@ -1,4 +1,5 @@
 import { Provider } from "react-redux";
+import { devToolsEnhancer } from "redux-devtools-extension";
 import { useState } from "react";
 import store from "./store/store";
 import Cart from "./components/cartComponent";
@@ -11,6 +12,8 @@ export default function App() {
   const [stops, setStops] = useState(0);
   const [stopDetailList, setStopDetailList] = useState([]);
   const [actualStops, setActualStops] = useState(0);
+  const [route, setRoute] = useState({});
+  // const store = createStore(store, devToolsEnhancer());
   return (
     <Provider store={store}>
       <div className="App">
@@ -22,8 +25,10 @@ export default function App() {
           setStops={setStops}
           stopDetailList={stopDetailList}
           setStopDetailList={setStopDetailList}
-          actualStops = {actualStops}
-          setActualStops = {setActualStops}
+          actualStops={actualStops}
+          setActualStops={setActualStops}
+          setRoute={setRoute}
+          route={route}
         />
       </div>
     </Provider>

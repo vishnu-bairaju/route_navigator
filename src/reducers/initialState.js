@@ -1,5 +1,5 @@
 const initialState = {
-  numOfItems: 0
+  routes: []
 };
 
 export default initialState;

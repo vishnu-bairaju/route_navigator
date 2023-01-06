@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Accordion from "../Accordion/AccordionComponent";
 import StopComponent from "../StopComponent/StopComponent";
+import allActions from "../../actions/indexAction";
 import "./styles.css";
+import { useSelector, useDispatch } from "react-redux";
 
 const CreateRouteComponent = ({
   action,
@@ -10,16 +12,67 @@ const CreateRouteComponent = ({
   setStopDetailList,
   setStops,
   stopDetailList,
-  actualStops,
   setActualStops,
+  setUniqueId,
+  setRoute,
+  route,
 }) => {
   const [isNewStopRequested, setIsNewStopRequested] = useState(false);
+  const [routeName, setRouteName] = useState("");
+  const [direction, setDirection] = useState("");
+  const [status, setStatus] = useState("active");
   const [stopUniqueId, setStopUniqueId] = useState(new Date().getTime());
+
+  const routes = useSelector((state) => {
+    console.log("State: ", state);
+    return state.routeReducer.routes;
+  });
+  const dispatch = useDispatch();
   const handleAddStopsClick = () => {
     setStops((prev) => prev + 1);
     setIsNewStopRequested((prev) => !prev);
     setStopUniqueId(new Date().getTime());
   };
+
+  const handleNameChange = (e) => {
+    setRouteName(e.target.value);
+  };
+
+  const handleDirectionChange = (e) => {
+    setDirection(e.target.value);
+  };
+
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
+  };
+
+  const handleRouteSubmit = () => {
+    console.log({
+      id: uniqueId,
+      name: routeName,
+      routeDirection: direction,
+      routeStatus: status,
+      stops: stopDetailList,
+    });
+    let routeToBeStored = {
+      id: uniqueId,
+      name: routeName,
+      routeDirection: direction,
+      routeStatus: status,
+      stops: stopDetailList,
+    };
+    // setRoute(routeToBeStored);
+    dispatch(allActions.routeAction.createRoute(routeToBeStored));
+    setStopDetailList([]);
+    setStops(0);
+    setActualStops(0);
+    setRouteName("");
+    setDirection("");
+    setStatus("active");
+    setUniqueId(new Date().getTime());
+  };
+
+  console.log("store routelist", routes);
 
   //   useEffect(() => {
   //     console.log(stopDetailList);
@@ -33,11 +86,11 @@ const CreateRouteComponent = ({
         <fieldset>
           <div className="field">
             <label className="field-label">Name</label>
-            <input />
+            <input onChange={handleNameChange} value={routeName} />
           </div>
           <div className="field">
             <label className="field-label">Direction</label>
-            <input />
+            <input onChange={handleDirectionChange} value={direction} />
           </div>
           <div className="field">
             <label className="field-label">Route Id</label>
@@ -45,7 +98,12 @@ const CreateRouteComponent = ({
           </div>
           <div className="field">
             <label className="field-label">Status</label>
-            <select id="status" className="status">
+            <select
+              id="status"
+              className="status"
+              onChange={handleStatusChange}
+              value={status}
+            >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
@@ -69,8 +127,8 @@ const CreateRouteComponent = ({
             })}
           </fieldset>
         )}
-        <div className={`${isNewStopRequested ? "" : "hide"}`}>
-          <fieldset>
+        {isNewStopRequested && (
+          <fieldset className={`${isNewStopRequested ? "" : "hide"}`}>
             <Accordion>
               <StopComponent
                 setStops={setStops}
@@ -80,17 +138,18 @@ const CreateRouteComponent = ({
                 setActualStops={setActualStops}
                 setIsNewStopRequested={setIsNewStopRequested}
                 isNewStopRequested={isNewStopRequested}
+                isNewStop
               />
             </Accordion>
           </fieldset>
-        </div>
+        )}
         {/* <StopComponent /> */}
         <div className={`${!isNewStopRequested ? "" : "hide"}`}>
           <div onClick={handleAddStopsClick} stops={stops}>
             Add Stop
           </div>
         </div>
-        <button>Submit</button>
+        <div onClick={handleRouteSubmit}>Submit</div>
       </form>
     </div>
   );

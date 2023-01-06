@@ -3,7 +3,7 @@ import { ADD_ITEM, DELETE_ITEM } from "./typesAction";
 const addItem = () => {
   console.log("addItem");
   return {
-    type: ADD_ITEM
+    type: ADD_ITEM,
   };
 };
 

@@ -10,63 +10,57 @@ const StopComponent = ({
   setActualStops,
   setIsNewStopRequested,
   isNewStopRequested,
+  isNewStop,
 }) => {
-  const [lat, setLat] = useState();
-  const [lng, setLng] = useState();
-  const [stopName, setStopName] = useState();
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
+  const [stopName, setStopName] = useState("");
   const [isStopAdded, setIsStopAdded] = useState(false);
 
   const handleOnSubmit = (e) => {
     let stop = {
       id: "STOP-" + index,
       name: stopName,
-      longitude: lat,
-      latitude: lng,
+      longitude: lng,
+      latitude: lat,
       addedToRoute: true,
     };
     setStopDetailList((prevList) => {
       prevList.push(stop);
       return prevList;
     });
-    // setActualStops((prev) => prev + 1);
+    setActualStops((prev) => prev + 1);
     setIsNewStopRequested((prev) => !prev);
     // setIsStopAdded((prev) => !prev);
     e.preventDefault();
   };
 
   const handleNameFocusOut = (e) => {
-    if (isNewStopRequested) {
-      setStopName("");
-    } else {
-      setStopName(e.target.value);
-    }
+    setStopName(e.target.value);
   };
 
   const handleLatFocusOut = (e) => {
-    if (isNewStopRequested) {
-      setLat(0);
-    } else {
-      setLat(e.target.value);
-    }
+    setLat(e.target.value);
   };
 
   const handleLngFocusOut = (e) => {
-    if (isNewStopRequested) {
-      setLng(0);
-    } else {
-      setLng(e.target.value);
-    }
+    setLng(e.target.value);
   };
 
   const handleRemoveStopClick = (removedStop) => {
     setStops((prev) => prev - 1);
-    let updatedStopsList = [];
-    stopDetailList.forEach((currstop, index) => {
-      if (removedStop && !(currstop.id === removedStop.id)) {
-        updatedStopsList.push(currstop);
-      }
-    });
-    setStopDetailList(updatedStopsList);
+    if (!isNewStopRequested && removedStop && removedStop.addedToRoute) {
+      let updatedStopsList = [];
+      stopDetailList.forEach((currstop, index) => {
+        if (!(currstop.id === removedStop.id)) {
+          updatedStopsList.push(currstop);
+        }
+      });
+      setStopDetailList(updatedStopsList);
+      setActualStops((prev) => prev - 1);
+    } else {
+      setIsNewStopRequested((isNewStopRequested) => !isNewStopRequested);
+    }
   };
 
   // useEffect(() => {
@@ -87,15 +81,24 @@ const StopComponent = ({
       </div>
       <div className="field">
         <label className="field-label">Stop Name</label>
-        <input onChange={handleNameFocusOut} value={stop && stop.name} />
+        <input
+          onChange={handleNameFocusOut}
+          value={stop && stop.addedToRoute && stop.name}
+        />
       </div>
       <div className="field">
         <label className="field-label">Latitude</label>
-        <input onChange={handleLatFocusOut} value={stop && stop.latitude} />
+        <input
+          onChange={handleLatFocusOut}
+          value={stop && stop.addedToRoute && stop.latitude}
+        />
       </div>
       <div className="field">
         <label className="field-label">Longitude</label>
-        <input onChange={handleLngFocusOut} value={stop && stop.longitude} />
+        <input
+          onChange={handleLngFocusOut}
+          value={!isNewStop ? stop.longitude : lng}
+        />
       </div>
       <div className="field">
         <div onClick={() => handleRemoveStopClick(stop)}>remove</div>

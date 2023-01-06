@@ -1,5 +1,5 @@
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import tt from "@tomtom-international/web-sdk-maps";
+import tt, { LngLat } from "@tomtom-international/web-sdk-maps";
 import ttapi from "@tomtom-international/web-sdk-services";
 import { useState, useEffect, useRef } from "react";
 import CreateRouteComponent from "../CreateRoute/CreateRouteComponent";
@@ -12,10 +12,10 @@ const MapComponent = ({
   stopDetailList,
   actualStops,
   setActualStops,
+  setRoute,
+  route,
 }) => {
   const mapElement = useRef();
-  const [longitude, setLongitude] = useState(-0.22);
-  const [latitude, setLatitude] = useState(51.2);
   const [map, setMap] = useState({});
   const [action, setAction] = useState("");
   const [uniqueId, setUniqueId] = useState(new Date().getTime());
@@ -29,28 +29,6 @@ const MapComponent = ({
     };
   };
 
-  const drawRoute = (geoJSON, map) => {
-    if (map.getLayer("route")) {
-      map.removeLayer("route");
-      map.removeSource("route");
-    }
-
-    console.log(map);
-
-    map.addLayer({
-      id: "route",
-      type: "line",
-      source: {
-        type: "geoJson",
-        data: geoJSON,
-      },
-      paint: {
-        "line-color": "#4a90e2",
-        "line-width": 6,
-      },
-    });
-  };
-
   const addDeliveryMarker = (lngLat, map) => {
     const element = document.createElement("div");
     element.className = "marker";
@@ -59,31 +37,18 @@ const MapComponent = ({
     })
       .setLngLat(lngLat)
       .addTo(map);
-    setStop(lngLat);
-  };
-
-  const createDestinations = (stopDetailList) => {
-    let destinations = [];
-    stopDetailList.forEach((stop) => {
-      destinations.push({
-        lat: stop.latitude,
-        lng: stop.longitude,
-      });
-      addDeliveryMarker(
-        {
-          lat: stop.latitude,
-          lng: stop.longitude,
-        },
-        map
-      );
-    });
-    return destinations;
   };
 
   useEffect(() => {
     const origin = {
-      lng: longitude,
-      lat: latitude,
+      lng:
+        stopDetailList &&
+        stopDetailList.length > 0 &&
+        stopDetailList[0].longitude,
+      lat:
+        stopDetailList &&
+        stopDetailList.length > 0 &&
+        stopDetailList[0].latitude,
     };
 
     let destinations = [];
@@ -95,43 +60,18 @@ const MapComponent = ({
         trafficIncidents: true,
         trafficFlow: true,
       },
-      center: [longitude, latitude],
+      center: [
+        stopDetailList &&
+          stopDetailList.length > 0 &&
+          stopDetailList[0].longitude,
+        stopDetailList &&
+          stopDetailList.length > 0 &&
+          stopDetailList[0].latitude,
+      ],
       zoom: 8,
     });
 
     setMap(map);
-
-    const addMarker = () => {
-      const popupOffset = {
-        bottom: [0, -25],
-      };
-      const popup = new tt.Popup({
-        offset: popupOffset,
-      }).setHTML("This is a stop");
-      const element = document.createElement("div");
-      element.className = "marker";
-      const marker = new tt.Marker({
-        draggable: true,
-        element: element,
-      })
-        .setLngLat([longitude, latitude])
-
-        .addTo(map);
-
-      marker.on("dragend", () => {
-        const lngLat = marker.getLngLat();
-        setLongitude(lngLat.lng);
-        setLatitude(lngLat.lat);
-      });
-
-      marker.setPopup(popup).togglePopup();
-
-      // setTimeout(() => {
-      //   marker.remove();
-      // }, 40000);
-    };
-
-    addMarker();
 
     const sortDestinations = (locations) => {
       const pointsForDestinations = locations.map((destination) => {
@@ -197,14 +137,34 @@ const MapComponent = ({
       });
     };
 
-    map.on("click", (e) => {
-      destinations = createDestinations(stopDetailList);
-      addDeliveryMarker(e.lngLat, map);
-      reCalculateRoutes();
-    });
+    const addStop = () => {
+      if (stopDetailList && stopDetailList.length === 1) {
+        console.log(stopDetailList[0].latitude, stopDetailList[0].longitude);
+        addDeliveryMarker(
+          new tt.LngLat(
+            Number(stopDetailList[0].longitude),
+            Number(stopDetailList[0].latitude)
+          ),
+          map
+        );
+      } else if (stopDetailList && stopDetailList.length > 0) {
+        stopDetailList.forEach((stop) => {
+          destinations.push(
+            new tt.LngLat(Number(stop.longitude), Number(stop.latitude))
+          );
+          addDeliveryMarker(
+            new tt.LngLat(Number(stop.longitude), Number(stop.latitude)),
+            map
+          );
+        });
+        reCalculateRoutes();
+      }
+    };
+
+    addStop();
 
     return () => map.remove();
-  }, [longitude, latitude]);
+  }, [actualStops]);
 
   const clickHandler = (actionType) => {
     setAction(actionType);
@@ -219,51 +179,49 @@ const MapComponent = ({
       {map && (
         <div className="map-container">
           <div ref={mapElement} className="mapDiv"></div>
-          <div className="search-bar">
-            <h1>Where to?</h1>
-            <input
-              type="text"
-              id="longitude"
-              className="longitude"
-              placeholder="Put in longitude"
-              onBlur={(e) => setLongitude(e.target.value)}
-            />
-            <input
-              type="text"
-              id="latitude"
-              className="latitude"
-              placeholder="Put in latitude"
-              onBlur={(e) => setLatitude(e.target.value)}
-            />
-            <button
+          <div className="options-bar">
+            <div
               onClick={() => clickHandler("create")}
-              className={action === "create" ? "hide" : ""}
+              className={` btn ${action === "create" ? "enabled" : ""}`}
             >
               Create
-            </button>
-
-            {/* <button onClick={() => clickHandler("view")}>View</button>
-            <div className={action === "view" ? "show" : "hide"}>
-              View Routes
             </div>
-            <button onClick={() => clickHandler("edit")}>Edit</button>
-            <div className={action === "edit" ? "show" : "hide"}>
-              Edit Routes
+            <div
+              onClick={() => clickHandler("view")}
+              className={` btn ${action === "view" ? "enabled" : ""}`}
+            >
+              View
             </div>
-            <button onClick={() => clickHandler("delete")}>Delete</button>
-            <div className={action === "delete" ? "show" : "hide"}>
-              Delete Routes
-            </div> */}
-            <CreateRouteComponent
-              action={action}
-              uniqueId={uniqueId}
-              stops={stops}
-              setStops={setStops}
-              stopDetailList={stopDetailList}
-              setStopDetailList={setStopDetailList}
-              actualStops={actualStops}
-              setActualStops={setActualStops}
-            />
+            <div
+              onClick={() => clickHandler("edit")}
+              className={` btn ${action === "edit" ? "enabled" : ""}`}
+            >
+              Edit
+            </div>
+            <div
+              onClick={() => clickHandler("delete")}
+              className={` btn ${action === "delete" ? "enabled" : ""}`}
+            >
+              Delete
+            </div>
+          </div>
+          <CreateRouteComponent
+            action={action}
+            uniqueId={uniqueId}
+            stops={stops}
+            setStops={setStops}
+            stopDetailList={stopDetailList}
+            setStopDetailList={setStopDetailList}
+            actualStops={actualStops}
+            setActualStops={setActualStops}
+            setRoute={setRoute}
+            route={route}
+            setUniqueId={setUniqueId}
+          />
+          <div className={action === "view" ? "show" : "hide"}>View Routes</div>
+          <div className={action === "edit" ? "show" : "hide"}>Edit Routes</div>
+          <div className={action === "delete" ? "show" : "hide"}>
+            Delete Routes
           </div>
         </div>
       )}
