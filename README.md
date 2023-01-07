@@ -1,10 +1,10 @@
 # route_navigator
 
-1.Integrated TOMTOM Maps API for showing routes on map
-2.Created below operations
-  i. Create a Route
-  ii. View a Route
-  iii. Edit a Route
-  iv. Delete a Route
-  v. Export all routes
-3.Used Redux for state management purpose.
+- Integrated TOMTOM Maps API for showing routes on map
+- Created below operations
+  - Create a Route
+  - View a Route
+  - Edit a Route
+  - Delete a Route
+  - Export all routes
+- Used Redux for state management purpose.
