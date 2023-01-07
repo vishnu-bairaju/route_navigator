@@ -1,9 +1,7 @@
-import itemActions from "./itemAction";
 import routeAction from "./routeAction";
 
 const allActions = {
-  itemActions,
-  routeAction
+  routeAction,
 };
 
 export default allActions;
