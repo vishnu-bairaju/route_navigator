@@ -14,6 +14,10 @@ const EditComponent = ({
   routes,
   setIsEdit,
 }) => {
+  const handleCloseClick = () => {
+    setIsEdit((prev) => !prev);
+    setStopDetailList([]);
+  };
   return (
     <>
       {EditRoute && (
@@ -32,7 +36,7 @@ const EditComponent = ({
             EditRoute={EditRoute}
             setIsEdit={setIsEdit}
           />
-          <div onClick={() => setIsEdit((prev) => !prev)} className="btn">
+          <div onClick={handleCloseClick} className="btn">
             close
           </div>
         </div>

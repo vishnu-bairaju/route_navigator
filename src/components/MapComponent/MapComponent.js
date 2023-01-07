@@ -5,7 +5,17 @@ import { useState, useEffect, useRef } from "react";
 import CreateRouteComponent from "../CreateRoute/CreateRouteComponent";
 import ViewComponent from "../ViewComponent/ViewComponent";
 import { useSelector } from "react-redux";
+import { CSVLink } from "react-csv";
+import { modifyRouteDataToExport } from "../../utils/utils";
 import "./styles.css";
+
+const headers = [
+  { label: "Route Id", key: "id" },
+  { label: "Route Name", key: "name" },
+  { label: "Route Direction", key: "routeDirection" },
+  { label: "Route Status", key: "routeStatus" },
+  { label: "Route Stops", key: "stops" },
+];
 
 const MapComponent = ({
   stops,
@@ -27,6 +37,7 @@ const MapComponent = ({
     console.log("State: ", state);
     return state.routeReducer.routes;
   });
+  const [isDataExportable, setIsDataExportable] = useState(false);
 
   const converToPoints = (lngLat) => {
     return {
@@ -147,6 +158,18 @@ const MapComponent = ({
     addStop();
   };
 
+  let csvReport = !!(routes && routes.length > 0)
+    ? {
+        data: modifyRouteDataToExport(routes),
+        headers: headers,
+        filename: "route_navigator.csv",
+      }
+    : {
+        data: [],
+        headers: headers,
+        filename: "route_navigator_empty.csv",
+      };
+
   useEffect(() => {
     let centerLng = 0;
     let centerLat = 0;
@@ -187,6 +210,11 @@ const MapComponent = ({
     setAction(actionType);
     if (actionType === "create") {
       setUniqueId(new Date().getTime());
+    } else if (actionType === "export") {
+      setIsDataExportable((prev) => {
+        if (routes && routes.length > 0) return true;
+        return false;
+      });
     }
   };
 
@@ -195,7 +223,6 @@ const MapComponent = ({
     setTargetRoute({ ...route });
   };
 
-  console.log(stop);
   return (
     <>
       {map && (
@@ -214,6 +241,36 @@ const MapComponent = ({
             >
               View all Routes
             </div>
+
+            <CSVLink
+              {...csvReport}
+              className={`btn ${action === "export" ? "enabled" : ""}`}
+              onClick={() => clickHandler("export")}
+            >
+              <div
+              // className={`btn ${action === "export" ? "enabled" : ""}`}
+              // onClick={() => clickHandler("export")}
+              >
+                Export all Routes
+              </div>
+            </CSVLink>
+            {/* {csvReport.length > 0 ? (
+              <CSVLink {...csvReport}>
+                <div
+                  className={`btn ${action === "export" ? "enabled" : ""}`}
+                  onClick={() => clickHandler("export")}
+                >
+                  Export all Routes
+                </div>
+              </CSVLink>
+            ) : (
+              <div
+                className={`btn ${action === "export" ? "enabled" : ""}`}
+                onClick={() => clickHandler("export")}
+              >
+                Export all Routes
+              </div>
+            )} */}
           </div>
           <div className={action === "create" ? "show" : "hide"}>
             <CreateRouteComponent
@@ -247,20 +304,13 @@ const MapComponent = ({
           ) : (
             action === "view" && <div>No Routes found!! 😕</div>
           )}
-          {/* <div className={action === "view" ? "show" : "hide"}>
-            <ViewComponent
-              clickViewHandler={clickViewHandler}
-              action={action}
-              uniqueId={uniqueId}
-              stops={stops}
-              setStops={setStops}
-              stopDetailList={stopDetailList}
-              setStopDetailList={setStopDetailList}
-              setActualStops={setActualStops}
-              setUniqueId={setUniqueId}
-              routes={routes}
-            />
-          </div> */}
+          {!isDataExportable ? (
+            <div className={action === "export" ? "show" : "hide"}>
+              No data found to export!! 😕
+            </div>
+          ) : (
+            action === "export" && <div>Data can be exported!! 😊</div>
+          )}
         </div>
       )}
     </>

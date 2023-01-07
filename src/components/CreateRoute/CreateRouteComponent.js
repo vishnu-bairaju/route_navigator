@@ -85,7 +85,8 @@ const CreateRouteComponent = ({
 
   useEffect(() => {
     if (EditRoute) setStopDetailList(EditRoute.stops);
-  }, [isEdit]);
+    else setStopDetailList([])
+  }, [!!(isEdit)]);
 
   console.log("stop details", stopDetailList);
 
